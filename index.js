@@ -21,6 +21,11 @@ const updateDB = (notes) => {
   fs.writeFileSync(filePath, JSON.stringify(notes));
 }
 
+const printNote = (note) => {
+  const output = `Name: ${note.name}\nContent: ${note.content}\n`;
+  console.log(output);
+}
+
 const createNote = (name, content) => {
   const note = {
     created: Date.now(),
@@ -73,6 +78,16 @@ const deleteNote = (name) => {
   console.log('Note Deleted Sucessfully');
 }
 
+const listNotes = (noteName) => {
+  const notes = readDB();
+
+  if(noteName) {
+    printNote(noteName);
+  } else {
+    notes.forEach(note => printNote(note));
+  }
+}
+
 // Configuring basic details about the project
 program
   .name('Notes Manager')
@@ -94,4 +109,9 @@ program
   .description('Delete an existing note.')
   .action((noteName) => deleteNote(noteName))
 
-program.parse(process.argv);
+program
+  .command('list [noteName]')
+  .description('List all the notes.')
+  .action((noteName) => listNotes(noteName))
+
+  program.parse(process.argv);
