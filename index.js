@@ -28,9 +28,9 @@ const createNote = (name, content) => {
     content,
     modified: null
   }
-  
+
   const notes = readDB();
-  
+
   // Checking if the name provided doesn't already exist in another note.
   const duplicateNote = notes.find(note => note.name === name);
   if (duplicateNote) {
@@ -39,6 +39,7 @@ const createNote = (name, content) => {
     return;
   }
 
+  // Creating a note in DB
   notes.push(note);
 
   updateDB(notes);
@@ -49,10 +50,27 @@ const updateNote = (name, newContent) => {
   const notes = readDB();
   const note = notes.find(note => note.name === name);
 
+  // Updating note content in DB
   note.content = newContent;
 
   updateDB(notes);
   console.log('Note Updated Successfully');
+}
+
+const deleteNote = (name) => {
+  const notes = readDB();
+  const noteIdx = notes.findIndex(note => note.name === name);
+
+  if (noteIdx == -1) {
+    console.log(`Note with name "${name}" doesn't exist`);
+    return;
+  }
+
+  // Removing note from DB
+  notes.splice(noteIdx, 1);
+  
+  updateDB(notes);
+  console.log('Note Deleted Sucessfully');
 }
 
 // Configuring basic details about the project
@@ -70,5 +88,10 @@ program
   .command('update <noteName> <newNoteContent>')
   .description('Update the content an existing note.')
   .action((noteName, newNoteContent) => updateNote(noteName, newNoteContent))
+
+program
+  .command('delete <noteName>')
+  .description('Delete an existing note.')
+  .action((noteName) => deleteNote(noteName))
 
 program.parse(process.argv);
