@@ -55,6 +55,11 @@ const updateNote = (name, newContent) => {
   const notes = readDB();
   const note = notes.find(note => note.name === name);
 
+  if(!note) {
+    console.log(`Error: note with name "${name}" not found`);
+    return;
+  }
+
   // Updating note content in DB
   note.content = newContent;
 
