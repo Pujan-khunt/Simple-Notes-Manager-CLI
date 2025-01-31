@@ -8,7 +8,9 @@ const filePath = path.join(__dirname, 'notes.json');
 
 // Create 'notes.json' to store objects containing information about a note
 // Initialize the file with an empty array 
-fs.writeFileSync(filePath, '[]');
+if(!fs.existsSync(filePath)) {
+  fs.writeFileSync(filePath, '[]');
+}
 
 const readDB = () => {
   const dataBuffer = fs.readFileSync(filePath);
