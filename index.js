@@ -8,13 +8,17 @@ const filePath = path.join(__dirname, 'notes.json');
 
 // Create 'notes.json' to store objects containing information about a note
 // Initialize the file with an empty array 
-if(!fs.existsSync(filePath)) {
+if (!fs.existsSync(filePath)) {
   fs.writeFileSync(filePath, '[]');
 }
 
 const readDB = () => {
   const dataBuffer = fs.readFileSync(filePath);
   return JSON.parse(dataBuffer);
+}
+
+const updateDB = (notes) => {
+  fs.writeFileSync(filePath, JSON.stringify(notes));
 }
 
 const createNote = (name, content) => {
@@ -24,20 +28,31 @@ const createNote = (name, content) => {
     content,
     modified: null
   }
-
+  
   const notes = readDB();
-
+  
   // Checking if the name provided doesn't already exist in another note.
   const duplicateNote = notes.find(note => note.name === name);
-  if(duplicateNote) {
+  if (duplicateNote) {
     console.log('Note with same name already exists. Try again.');
-    console.log('Existing Note =',duplicateNote);
+    console.log('Existing Note =', duplicateNote);
     return;
   }
 
   notes.push(note);
-  fs.writeFileSync(filePath, JSON.stringify(notes));  
-  console.log('Note added successfully');
+
+  updateDB(notes);
+  console.log('Note Added Successfully');
+}
+
+const updateNote = (name, newContent) => {
+  const notes = readDB();
+  const note = notes.find(note => note.name === name);
+
+  note.content = newContent;
+
+  updateDB(notes);
+  console.log('Note Updated Successfully');
 }
 
 // Configuring basic details about the project
@@ -48,7 +63,12 @@ program
 
 program
   .command('create <noteName> <noteContent>')
-  .description('Create a note, providing the content and the name for the note.')
+  .description('Create a new note.')
   .action((noteName, noteContent) => createNote(noteName, noteContent))
+
+program
+  .command('update <noteName> <newNoteContent>')
+  .description('Update the content an existing note.')
+  .action((noteName, newNoteContent) => updateNote(noteName, newNoteContent))
 
 program.parse(process.argv);
