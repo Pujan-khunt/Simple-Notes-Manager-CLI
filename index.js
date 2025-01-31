@@ -23,7 +23,16 @@ const createNote = (name, content) => {
     modified: null
   }
 
-  let notes = readDB();
+  const notes = readDB();
+
+  // Checking if the name provided doesn't already exist in another note.
+  const duplicateNote = notes.find(note => note.name === name);
+  if(duplicateNote) {
+    console.log('Note with same name already exists. Try again.');
+    console.log('Existing Note =',duplicateNote);
+    return;
+  }
+
   notes.push(note);
   fs.writeFileSync(filePath, JSON.stringify(notes));  
   console.log('Note added successfully');
