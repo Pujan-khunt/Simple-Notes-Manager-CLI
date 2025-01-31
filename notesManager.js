@@ -10,13 +10,21 @@ if (!fs.existsSync(filePath)) {
 
 // Utility to read the notes from database
 export const readDB = () => {
-  const dataBuffer = fs.readFileSync(filePath);
-  return JSON.parse(dataBuffer);
+  try {
+    const dataBuffer = fs.readFileSync(filePath);
+    return JSON.parse(dataBuffer);
+  } catch (error) {
+    console.log('Error while reading from database');
+  }
 }
 
 // Utility to update the database
 export const updateDB = (notes) => {
-  fs.writeFileSync(filePath, JSON.stringify(notes));
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(notes));
+  } catch (error) {
+    console.log('Error while updating the database');
+  }
 }
 
 // Utility to print a single note
