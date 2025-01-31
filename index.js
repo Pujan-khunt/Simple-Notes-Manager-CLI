@@ -88,6 +88,10 @@ const listNotes = (noteName) => {
   }
 }
 
+const clearNotes = () => {
+  fs.writeFileSync(filePath, '[]');
+}
+
 // Configuring basic details about the project
 program
   .name('Notes Manager')
@@ -113,5 +117,10 @@ program
   .command('list [noteName]')
   .description('List all the notes.')
   .action((noteName) => listNotes(noteName))
+
+program
+  .command('clear')
+  .description('Clear all existing notes.')
+  .action(() => clearNotes())
 
   program.parse(process.argv);
