@@ -1,5 +1,5 @@
 {
-  "name": "notes-manager-cli",
+  "name": "@pujan2412/notes-manager-cli",
   "description": "A simple notes manager that allows you to create, read, update and delete notes.",
   "version": "1.0.0",
   "main": "cli.js",
@@ -11,7 +11,7 @@
   },
   "keywords": [],
   "author": "Pujan Khunt",
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "dependencies": {
     "commander": "^13.1.0"
