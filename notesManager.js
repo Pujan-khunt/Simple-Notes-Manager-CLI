@@ -1,17 +1,25 @@
 import fs from 'fs';
+import path from 'path';
+import { spawnSync } from 'child_process';
+import { fileURLToPath } from 'url';
 
-// Default database filepath
-const filePath = './notes.json';
+// Paths
+const __filename = fileURLToPath(import.meta.url); // Path of the current file
+const __dirname = path.dirname(__filename); // Path of the current directory
+
+// Filepaths
+const dbFilePath = path.join(__dirname, 'notes.json');
+const tempFilePath = path.join(__dirname, 'temp.txt');
 
 // Initialize the database if it doesn't exist
-if (!fs.existsSync(filePath)) {
-  fs.writeFileSync(filePath, '[]');
+if (!fs.existsSync(dbFilePath)) {
+  fs.writeFileSync(dbFilePath, '[]');
 }
 
 // Utility to read the notes from database
-export const readDB = () => {
+const readDB = () => {
   try {
-    const dataBuffer = fs.readFileSync(filePath);
+    const dataBuffer = fs.readFileSync(dbFilePath);
     return JSON.parse(dataBuffer);
   } catch (error) {
     console.log('Error while reading from database');
@@ -19,29 +27,40 @@ export const readDB = () => {
 }
 
 // Utility to update the database
-export const updateDB = (notes) => {
+const updateDB = (notes) => {
   try {
-    fs.writeFileSync(filePath, JSON.stringify(notes));
+    fs.writeFileSync(dbFilePath, JSON.stringify(notes));
   } catch (error) {
     console.log('Error while updating the database');
   }
 }
 
 // Utility to print a single note
-export const printNote = (note) => {
+const printNote = (note) => {
   const output = `Name: ${note.name}\nContent: ${note.content}\n`;
   console.log(output);
 }
 
+// Utility to clear the note content editor
+const clearEditor = () => {
+  fs.writeFileSync(tempFilePath, '');
+}
+
+// Utility to open the note content editor
+const openEditor = () => {
+  const editor = process.env.EDITOR || 'vim';
+  spawnSync(editor, [tempFilePath], { stdio: "inherit" });
+}
+
+// Utility to read content from the note content editor
+const readEditor = () => {
+  const noteContent = fs.readFileSync(tempFilePath, 'utf-8');
+  clearEditor();
+  return noteContent;
+}
+
 // Function to create a new note
 export const createNote = (name, content) => {
-  const note = {
-    created: Date.now(),
-    name,
-    content,
-    modified: null
-  }
-
   const notes = readDB();
 
   // Checking if the name provided doesn't already exist in another note.
@@ -52,9 +71,26 @@ export const createNote = (name, content) => {
     return;
   }
 
+  // Creation of note object
+  const note = {
+    created: Date.now(),
+    name,
+    content,
+    modified: null
+  }
+
+  // Note's content will be from the temp file
+  // If no content has been provided while creating the note.
+  if (!content) {
+    openEditor();
+    const noteContent = readEditor();
+    note.content = noteContent;
+  }
+
   // Creating a note in DB
   notes.push(note);
 
+  // Updating DB and notifying user
   updateDB(notes);
   console.log('Note Added Successfully');
 }

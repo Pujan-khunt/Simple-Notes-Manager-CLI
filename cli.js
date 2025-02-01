@@ -12,9 +12,10 @@ program
   .version('1.0.0')
 
 program
-  .command('create <noteName> <noteContent>')
+  .command('create <noteName>')
   .description('Create a new note.')
-  .action((noteName, noteContent) => createNote(noteName, noteContent))
+  .option('-m, --message <noteContent>', 'Directly provide the note content.')
+  .action((noteName, options) => createNote(noteName, options.message))
 
 program
   .command('update <noteName> <newNoteContent>')
