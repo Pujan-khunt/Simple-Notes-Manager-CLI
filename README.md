@@ -50,17 +50,18 @@ To install Notes Manager CLI, follow these steps:
   ```
 
 ## Usage
-After installation, you can use the `notes` command followed by various subcommands to manage your notes.
+After installation, you can use the `nman` command followed by various subcommands to manage your notes.
 
 ### Example:
 ```sh
-nman create "My first note" "personal"
+nman create "My first note" -m "this is the content of my first note."
 ```
 
 ## Commands
-- `nman create <note> [-t <tag>]`: Add a new note with an optional tag.
-- `nman list`: List all notes.
-- `nman list [noteName]`: View a specific note by its name.
-- `nman update <noteName> <new content>`: Update the content of a specific note.
-- `nman delete <noteName>`: Delete a specific note by its name.
-- `nman clear`: Clear/Delete all the notes
+1. `nman create <noteName>`: creates a new note and opens the default editor to enter the content of the note. (you can directly provide the message using the -m flag as shown in the example)
+
+2. `nman list`: List all notes in a tabular format. (Shows only a constant number of lines per note. To view the full note use thc command mentioned below)
+3. `nman list [noteName]`: View a specific note by its name in a box format.
+4. `nman update <noteName>`: Update the content of a specific note (it will open the default editor if the message is not provided directly using the '-m' flag).
+5. `nman delete <noteName>`: Delete a specific note by its name.
+6. `nman clear`: Clear/Delete all the notes
