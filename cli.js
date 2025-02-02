@@ -18,9 +18,10 @@ program
   .action((noteName, options) => createNote(noteName, options.message))
 
 program
-  .command('update <noteName> <newNoteContent>')
+  .command('update <noteName>')
   .description('Update the content an existing note.')
-  .action((noteName, newNoteContent) => updateNote(noteName, newNoteContent))
+  .option('-m, --message <newNoteContent>', 'Directly provide the new content.')
+  .action((noteName, options) => updateNote(noteName, options.message))
 
 program
   .command('delete <noteName>')

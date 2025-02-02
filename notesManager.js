@@ -37,7 +37,7 @@ const updateDB = (notes) => {
 
 // Utility to print a single note
 const printNote = (note) => {
-  const output = `Name: ${note.name}\nContent: ${note.content}\n`;
+  const output = `Name: ${note.name}\nContent: ${note.content}`;
   console.log(output);
 }
 
@@ -47,20 +47,20 @@ const clearEditor = () => {
 }
 
 // Utility to open the note content editor
-const openEditor = () => {
+const openEditor = (initialContent = '') => {
+  fs.writeFileSync(tempFilePath, initialContent);
   const editor = process.env.EDITOR || 'vim';
   spawnSync(editor, [tempFilePath], { stdio: "inherit" });
 }
 
 // Utility to read content from the note content editor
 const readEditor = () => {
-  const noteContent = fs.readFileSync(tempFilePath, 'utf-8');
-  clearEditor();
-  return noteContent;
+  return fs.readFileSync(tempFilePath, 'utf-8');
 }
 
 // Function to create a new note
 export const createNote = (name, content) => {
+  // Array of note objects
   const notes = readDB();
 
   // Checking if the name provided doesn't already exist in another note.
@@ -84,6 +84,7 @@ export const createNote = (name, content) => {
   if (!content) {
     openEditor();
     const noteContent = readEditor();
+    clearEditor();
     note.content = noteContent;
   }
 
@@ -105,8 +106,14 @@ export const updateNote = (name, newContent) => {
     return;
   }
 
-  // Updating note content in DB
-  note.content = newContent;
+  if(!newContent) {
+    openEditor(note.content);
+    const contentFromEditor = readEditor();
+    clearEditor();
+    note.content = contentFromEditor;
+  } else {
+    note.content = newContent;
+  }
 
   updateDB(notes);
   console.log('Note Updated Successfully');
