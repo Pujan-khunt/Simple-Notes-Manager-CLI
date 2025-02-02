@@ -2,6 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import Table from 'cli-table3';
+import boxen from 'boxen';
+
+// Constants
+const linesToDisplayPerNote = 2;
 
 // Paths
 const __filename = fileURLToPath(import.meta.url); // Path of the current file
@@ -106,7 +111,7 @@ export const updateNote = (name, newContent) => {
     return;
   }
 
-  if(!newContent) {
+  if (!newContent) {
     openEditor(note.content);
     const contentFromEditor = readEditor();
     clearEditor();
@@ -139,12 +144,55 @@ export const deleteNote = (name) => {
 // Function to list all the notes or a specific note from the database
 export const listNotes = (noteName) => {
   const notes = readDB();
+  const table = new Table({
+    head: ["No.", "Title", "Content"]
+  });
 
   if (noteName) {
-    printNote(noteName);
+    const note = notes.find(note => note.name == noteName);
+
+    // Note not found
+    if (!note) {
+      console.log(`Note "${noteName}" doesn't exist`);
+      return;
+    }
+
+    console.log(boxen(note.content, {
+      title: note.name,
+      titleAlignment: "center"
+    }));
+
   } else {
-    notes.forEach(note => printNote(note));
+    // Empty database case
+    if (notes.length === 0) {
+      console.log('Create notes. No notes are currently stored.');
+      return;
+    }
+
+    // Creating a table with all the notes.
+    // Only displaying a constant number of lines per note.
+    notes.forEach((note, index) => {
+      let idx;
+      let cnt = 0;
+      for (let i = 0; i < note.content.length; i++) {
+        if (note.content[i] === '\n') {
+          cnt++;
+        }
+
+        if (cnt == linesToDisplayPerNote) {
+          idx = i;
+          break;
+        }
+      }
+
+      // Building the table
+      table.push([index + 1, note.name, note.content.substr(0, idx)]);
+
+      // Printing the table.
+      console.log(table.toString());
+    });
   }
+
 }
 
 // Function to clear the database

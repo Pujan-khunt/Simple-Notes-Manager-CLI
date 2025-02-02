@@ -14,6 +14,8 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
+    "boxen": "^8.0.1",
+    "cli-table3": "^0.6.5",
     "commander": "^13.1.0"
   }
 }
