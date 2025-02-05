@@ -2,9 +2,9 @@
   "name": "@pujan2412/notes-manager-cli",
   "description": "A simple notes manager that allows you to create, read, update and delete notes.",
   "version": "2.0.1",
-  "main": "cli.js",
+  "main": "bin/cli.js",
   "bin": {
-    "nman": "cli.js"
+    "nman": "bin/cli.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

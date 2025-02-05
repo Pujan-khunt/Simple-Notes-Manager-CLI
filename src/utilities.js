@@ -1,0 +1,63 @@
+import fs from 'fs/promises';
+import { spawnSync } from 'child_process';
+import { dbFilePath, tempFilePath } from "./constants.js";
+
+// Utility to read the notes from database
+export const readDB = async () => {
+  try {
+    const dataBuffer = await fs.readFile(dbFilePath);
+    return JSON.parse(dataBuffer);
+  } catch (error) {
+    console.log('Error while reading from database', error.message);
+    process.exit(1);
+  }
+}
+
+// Utility to update the database
+export const updateDB = async (notes) => {
+  try {
+    await fs.writeFile(dbFilePath, JSON.stringify(notes));
+  } catch (error) {
+    console.log('Error while updating the database', error.message);
+    process.exit(1);
+  }
+}
+
+// Utility to clear the note content editor
+const clearEditor = async () => {
+  try {
+    await fs.writeFile(tempFilePath, '');
+  } catch (error) {
+    console.log('Error while clearing the note content editor', error.message);
+    process.exit(1);
+  }
+}
+
+// Utility to open the note content editor
+const openEditor = async (initialContent = '') => {
+  try {
+    await fs.writeFile(tempFilePath, initialContent);
+    const editor = process.env.EDITOR || 'vim';
+    spawnSync(editor, [tempFilePath], { stdio: "inherit" });
+  } catch (error) {
+    console.log('Error while opening the note content editor', error.message);
+    process.exit(1);
+  }
+}
+
+// Utility to read content from the note content editor
+const readEditor = async () => {
+  try {
+    return await fs.readFile(tempFilePath, 'utf-8');
+  } catch (error) {
+    console.log('Error while reading the note content editor', error.message);
+  }
+}
+
+// Utility to use the editor
+export const useEditor = async (initialContent) => {
+  await openEditor(initialContent);
+  const contentFromEditor = await readEditor();
+  await clearEditor();
+  return contentFromEditor;
+}

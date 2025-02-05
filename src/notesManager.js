@@ -1,72 +1,22 @@
-import fs from 'fs';
-import path from 'path';
-import { spawnSync } from 'child_process';
-import { fileURLToPath } from 'url';
+import fs from 'fs/promises';
 import Table from 'cli-table3';
 import boxen from 'boxen';
-
-// Constants
-const linesToDisplayPerNote = 2;
-
-// Paths
-const __filename = fileURLToPath(import.meta.url); // Path of the current file
-const __dirname = path.dirname(__filename); // Path of the current directory
-
-// Filepaths
-const dbFilePath = path.join(__dirname, 'notes.json');
-const tempFilePath = path.join(__dirname, 'temp.txt');
+import { linesToDisplayPerNote, dbFilePath } from './constants.js'
+import { readDB, updateDB, useEditor } from './utilities.js';
 
 // Initialize the database if it doesn't exist
-if (!fs.existsSync(dbFilePath)) {
-  fs.writeFileSync(dbFilePath, '[]');
-}
-
-// Utility to read the notes from database
-const readDB = () => {
+const initializeDB = async () => {
   try {
-    const dataBuffer = fs.readFileSync(dbFilePath);
-    return JSON.parse(dataBuffer);
+    await fs.access(dbFilePath);
   } catch (error) {
-    console.log('Error while reading from database');
+    await fs.writeFile(dbFilePath, '[]');
   }
-}
-
-// Utility to update the database
-const updateDB = (notes) => {
-  try {
-    fs.writeFileSync(dbFilePath, JSON.stringify(notes));
-  } catch (error) {
-    console.log('Error while updating the database');
-  }
-}
-
-// Utility to print a single note
-const printNote = (note) => {
-  const output = `Name: ${note.name}\nContent: ${note.content}`;
-  console.log(output);
-}
-
-// Utility to clear the note content editor
-const clearEditor = () => {
-  fs.writeFileSync(tempFilePath, '');
-}
-
-// Utility to open the note content editor
-const openEditor = (initialContent = '') => {
-  fs.writeFileSync(tempFilePath, initialContent);
-  const editor = process.env.EDITOR || 'vim';
-  spawnSync(editor, [tempFilePath], { stdio: "inherit" });
-}
-
-// Utility to read content from the note content editor
-const readEditor = () => {
-  return fs.readFileSync(tempFilePath, 'utf-8');
 }
 
 // Function to create a new note
-export const createNote = (name, content) => {
-  // Array of note objects
-  const notes = readDB();
+export const createNote = async (name, content) => {
+  await initializeDB();
+  const notes = await readDB();
 
   // Checking if the name provided doesn't already exist in another note.
   const duplicateNote = notes.find(note => note.name === name);
@@ -84,13 +34,10 @@ export const createNote = (name, content) => {
     modified: null
   }
 
-  // Note's content will be from the temp file
+  // Note's content will come from the temp file
   // If no content has been provided while creating the note.
   if (!content) {
-    openEditor();
-    const noteContent = readEditor();
-    clearEditor();
-    note.content = noteContent;
+    note.content = await useEditor();
   }
 
   // Creating a note in DB
@@ -111,15 +58,15 @@ export const updateNote = (name, newContent) => {
     return;
   }
 
+  // updated content of note will come from temp file
+  // if not content is provided while updating the note.
   if (!newContent) {
-    openEditor(note.content);
-    const contentFromEditor = readEditor();
-    clearEditor();
-    note.content = contentFromEditor;
+    note.content = useEditor(note.content);
   } else {
     note.content = newContent;
   }
 
+  // Updating DB and notifying user
   updateDB(notes);
   console.log('Note Updated Successfully');
 }
@@ -137,19 +84,20 @@ export const deleteNote = (name) => {
   // Removing note from DB
   notes.splice(noteIdx, 1);
 
+  // Updating the DB and notifying the user
   updateDB(notes);
   console.log('Note Deleted Sucessfully');
 }
 
 // Function to list all the notes or a specific note from the database
-export const listNotes = (noteName) => {
-  const notes = readDB();
+export const listNotes = async (noteName) => {
+  const notes = await readDB();
   const table = new Table({
     head: ["No.", "Title", "Content"]
   });
 
   if (noteName) {
-    const note = notes.find(note => note.name == noteName);
+    const note = notes.find(note => note.name === noteName);
 
     // Note not found
     if (!note) {
@@ -157,6 +105,7 @@ export const listNotes = (noteName) => {
       return;
     }
 
+    // Printing a single note in box format
     console.log(boxen(note.content, {
       title: note.name,
       titleAlignment: "center"
@@ -188,9 +137,10 @@ export const listNotes = (noteName) => {
       // Building the table
       table.push([index + 1, note.name, note.content.substr(0, idx)]);
 
-      // Printing the table.
-      console.log(table.toString());
     });
+
+    // Printing the table.
+    console.log(table.toString());
   }
 
 }
