@@ -3,7 +3,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 // Constants
-export const linesToDisplayPerNote = 2;
+export const linesToDisplayPerNote = 3;
+export const charactersToDisplayPerLine = 30;
 
 // Paths
 const __filename = fileURLToPath(import.meta.url); // Path of the current file

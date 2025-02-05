@@ -7,7 +7,7 @@
     "nman": "bin/cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "postInstall.js"
   },
   "keywords": [],
   "author": "Pujan Khunt",
@@ -17,6 +17,7 @@
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",
     "cli-table3": "^0.6.5",
+    "figlet": "^1.8.0",
     "commander": "^13.1.0"
   }
 }

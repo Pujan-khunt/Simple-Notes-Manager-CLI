@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import { execSync, spawnSync } from 'child_process';
 import { dbFilePath, tempFilePath } from "./constants.js";
+import { charactersToDisplayPerLine, linesToDisplayPerNote } from './constants.js';
 
 // Utility to read the notes from database
 export const readDB = async () => {
@@ -54,12 +55,12 @@ const clearEditor = async () => {
 const openEditor = async (initialContent = "") => {
   try {
     await fs.writeFile(tempFilePath, initialContent);
-    
+
     // Creating command based on the editor available to the user
     let editor = process.env.VISUAL || process.env.EDITOR;
     if (!editor) {
       if (isEditorAvailable("code")) {
-        editor = "code --wait";
+        editor = "code";
       } else if (isEditorAvailable("vim")) {
         editor = "vim";
       } else {
@@ -67,7 +68,11 @@ const openEditor = async (initialContent = "") => {
       }
     }
 
-    spawnSync(editor, [tempFilePath], { stdio: "inherit", shell: true });
+    if (editor === "code") {
+      spawnSync(editor, ["--wait", tempFilePath], { stdio: "inherit", shell: true });
+    } else {
+      spawnSync(editor, [tempFilePath], { stdio: "inherit", shell: true });
+    }
 
   } catch (error) {
     console.log('Error while opening the note content editor', error.message);
@@ -87,7 +92,15 @@ const readEditor = async () => {
 // Utility to use the editor
 export const useEditor = async (initialContent) => {
   await openEditor(initialContent);
-  const contentFromEditor = (await readEditor()).trim();
+  const contentFromEditor = await readEditor();
   await clearEditor();
-  return contentFromEditor;
+  return contentFromEditor.trim();
+}
+
+export const displayTrimmedContent = (content) => {
+  return content
+    .split("\n")
+    .slice(0, linesToDisplayPerNote)
+    .map(line => line.slice(0, charactersToDisplayPerLine))
+    .join("\n");
 }

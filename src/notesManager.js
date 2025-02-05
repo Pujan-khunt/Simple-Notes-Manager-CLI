@@ -2,8 +2,9 @@ import fs from 'fs/promises';
 import Table from 'cli-table3';
 import boxen from 'boxen';
 import chalk from 'chalk';
-import { linesToDisplayPerNote, dbFilePath } from './constants.js'
-import { readDB, updateDB, useEditor } from './utilities.js';
+import figlet from 'figlet';
+import { dbFilePath } from './constants.js'
+import { readDB, updateDB, useEditor, displayTrimmedContent } from './utilities.js';
 
 // Initialize the database if it doesn't exist
 const initializeDB = async () => {
@@ -85,7 +86,7 @@ export const updateNote = async (name, newContent) => {
 
   // Updating DB and notifying user
   updateDB(notes);
-  console.log('Note Updated Successfully');
+  console.log(chalk.greenBright("Note Updated Successfully"));
 }
 
 // Function to delete a note.
@@ -138,21 +139,10 @@ export const listNotes = async (noteName) => {
     // Creating a table with all the notes.
     // Only displaying a constant number of lines per note.
     notes.forEach((note, index) => {
-      let idx;
-      let cnt = 0;
-      for (let i = 0; i < note.content.length; i++) {
-        if (note.content[i] === '\n') {
-          cnt++;
-        }
-
-        if (cnt == linesToDisplayPerNote) {
-          idx = i;
-          break;
-        }
-      }
+      
 
       // Building the table
-      table.push([index + 1, note.name, note.content.substr(0, idx)]);
+      table.push([index + 1, note.name, displayTrimmedContent(note.content)]);
 
     });
 
@@ -166,4 +156,8 @@ export const listNotes = async (noteName) => {
 export const clearNotes = () => {
   updateDB([]);
   console.log(chalk.magentaBright("Cleared all the notes."));
+}
+
+export const showFigletInHelp = () => {
+  console.log(figlet.textSync("Nman", { font: "Univers", horizontalLayout: "full" }));
 }

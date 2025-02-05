@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { createNote, updateNote, deleteNote, listNotes, clearNotes } from '../src/notesManager.js';
+import { createNote, updateNote, deleteNote, listNotes, clearNotes, showFigletInHelp } from '../src/notesManager.js';
 
 const program = new Command();
 
@@ -37,5 +37,12 @@ program
   .command('clear')
   .description('Clear all existing notes.')
   .action(() => clearNotes())
+
+program
+  .option("-h, --help", "Display help message")
+  .action(() => {
+    showFigletInHelp();
+    program.help();
+  })
 
 program.parse(process.argv);
