@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { spawnSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 import { dbFilePath, tempFilePath } from "./constants.js";
 
 // Utility to read the notes from database
@@ -23,6 +23,23 @@ export const updateDB = async (notes) => {
   }
 }
 
+const isEditorAvailable = (editor) => {
+  try {
+    let command = '';
+
+    if (process.platform === "win32") {
+      command = `where ${editor}`;
+    } else {
+      command = `which ${editor}`;
+    }
+
+    execSync(command, { stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // Utility to clear the note content editor
 const clearEditor = async () => {
   try {
@@ -34,11 +51,24 @@ const clearEditor = async () => {
 }
 
 // Utility to open the note content editor
-const openEditor = async (initialContent = '') => {
+const openEditor = async (initialContent = "") => {
   try {
     await fs.writeFile(tempFilePath, initialContent);
-    const editor = process.env.EDITOR || 'vim';
-    spawnSync(editor, [tempFilePath], { stdio: "inherit" });
+    
+    // Creating command based on the editor available to the user
+    let editor = process.env.VISUAL || process.env.EDITOR;
+    if (!editor) {
+      if (isEditorAvailable("code")) {
+        editor = "code --wait";
+      } else if (isEditorAvailable("vim")) {
+        editor = "vim";
+      } else {
+        editor = "nano";
+      }
+    }
+
+    spawnSync(editor, [tempFilePath], { stdio: "inherit", shell: true });
+
   } catch (error) {
     console.log('Error while opening the note content editor', error.message);
     process.exit(1);
@@ -57,7 +87,7 @@ const readEditor = async () => {
 // Utility to use the editor
 export const useEditor = async (initialContent) => {
   await openEditor(initialContent);
-  const contentFromEditor = await readEditor();
+  const contentFromEditor = (await readEditor()).trim();
   await clearEditor();
   return contentFromEditor;
 }

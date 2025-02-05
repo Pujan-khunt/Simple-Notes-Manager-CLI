@@ -89,8 +89,8 @@ export const updateNote = async (name, newContent) => {
 }
 
 // Function to delete a note.
-export const deleteNote = (name) => {
-  const notes = readDB();
+export const deleteNote = async (name) => {
+  const notes = await readDB();
   const noteIdx = notes.findIndex(note => note.name === name);
 
   if (noteIdx == -1) {

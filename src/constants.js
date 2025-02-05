@@ -1,3 +1,4 @@
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -10,4 +11,4 @@ export const __dirname = path.dirname(__filename); // Path of the current direct
 
 // Filepaths
 export const dbFilePath = path.join(__dirname, 'notes.json');
-export const tempFilePath = path.join(__dirname, 'temp.txt');
+export const tempFilePath = path.join(os.tmpdir(), 'temp.txt');
