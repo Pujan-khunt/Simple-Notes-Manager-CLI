@@ -41,13 +41,16 @@ export const createNote = async (name, content) => {
 
   // Note's content will come from the temp file
   // If no content has been provided while creating the note.
-  if (!content) {
+  if (content === undefined) {
     note.content = await useEditor();
 
     if (!note.content) {
       console.log(chalk.redBright("No content has been provided. Try again."));
       return;
     }
+  } else if(content === "") {
+    console.log(chalk.redBright("Note content cannot be empty. Aborting Creation of note."));
+    return;
   }
 
   // Creating a note in DB
@@ -55,7 +58,7 @@ export const createNote = async (name, content) => {
 
   // Updating DB and notifying user
   updateDB(notes);
-  console.log(chalk.greenBright("Note Added Successfully"));
+  console.log(chalk.greenBright("Note Created Successfully"));
 }
 
 // Function to update an existing note.
@@ -155,7 +158,7 @@ export const listNotes = async (noteName) => {
 // Function to clear the database
 export const clearNotes = () => {
   updateDB([]);
-  console.log(chalk.magentaBright("Cleared all the notes."));
+  console.log(chalk.magentaBright("Cleared All The Notes."));
 }
 
 export const showFigletInHelp = () => {

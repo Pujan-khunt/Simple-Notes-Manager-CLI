@@ -49,19 +49,124 @@ To install Notes Manager CLI, follow these steps:
   npm link
   ```
 
+<br/>
+
 ## Usage
 After installation, you can use the `nman` command followed by various subcommands to manage your notes.
 
+<br/>
+
 ### Example:
 ```sh
-nman create "My first note" -m "this is the content of my first note."
+nman create "My Linear Algebra Notes"
+Note Created Successfully # Output of the above command
 ```
 
-## Commands
-1. `nman create <noteName>`: creates a new note and opens the default editor to enter the content of the note. (you can directly provide the message using the -m flag as shown in the example)
+<br/>
 
-2. `nman list`: List all notes in a tabular format. (Shows only a constant number of lines per note. To view the full note use thc command mentioned below)
-3. `nman list [noteName]`: View a specific note by its name in a box format.
-4. `nman update <noteName>`: Update the content of a specific note (it will open the default editor if the message is not provided directly using the '-m' flag).
-5. `nman delete <noteName>`: Delete a specific note by its name.
-6. `nman clear`: Clear/Delete all the notes
+## Commands
+
+### 1. Creating Notes
+---
+The command to create a note is 
+```bash
+nman create <name>
+Note Created Successfully # Output of the above command
+```
+1. This will open the default editor which is set in your system, it will default to '_Visual Studio Code_' if default editor is not set, and will default to '_Vim_' if '_Visual Studio Code_' doesn't exist, and if '_Vim_' doesn't exist then it will choose '_Nano_'.
+
+2. After you enter the content just close the file to save it.
+
+3. You will recieve the message 'Note created successfully' in green color.
+
+ You can also use the '-m' flag to provide the content directly while creating the note.
+
+#### Syntax of creating a note using -m
+```bash
+nman create <name> -m "<content>"
+Note Created Successfully # Output of the above command
+```
+
+<br/>
+
+### 2. Updating Notes
+---
+The command to update a note is
+```bash
+nman update <name>
+Note Updated Successfully # Output of the above command
+```
+
+1. This will open the default editor which is set in your system, it will default to '_Visual Studio Code_' if default editor is not set, and will default to '_Vim_' if '_Visual Studio Code_' doesn't exist, and if '_Vim_' doesn't exist then it will choose '_Nano_'.
+
+2. After you update the content just close the file to save it.
+
+3. You will recieve the message 'Note Updated Successfully' in green color.
+
+You can also use the '-m' flag to provide the content directly while updating the note.
+
+__NOTE: if you use the -m flag the provided content will overwrite the existing content. So use only when necessary.__
+
+#### Syntax of updating a note using -m 
+```bash
+nman update <name> -m "<content>"
+Note Updated Successfully # Output of the above command
+```
+
+<br/>
+
+### 3. Reading Notes
+---
+#### 1. Reading All the Notes
+the command for reading all the notes is
+```bash
+nman list
+```
+
+Output Of the Above Command
+![Output of nman list command](./Images/nman-list.png)
+
+This command will list all the lists in a table format (No., Note, Content)
+
+__NOTE: This command is only meant to view which notes are present.
+To fully view note use the command mentioned below (Reading a specific note).__
+
+---
+
+#### 2. Reading a Specific Note
+The command for reading a specific note is...
+```bash
+nman list <name>
+```
+
+Output of the above command
+![Output of nman list <note> command](./Images/GOT-Season-8-sucks.png)
+
+This command will display the contents of a specific note.
+
+<br/>
+
+### 4. Deleting Notes
+---
+#### 1. Deleting a Specific Note
+The command to delete a specific note is...
+```bash
+nman delete <name>
+Note Deleted Successfully # Output of the above command
+```
+
+This command will delete the note.
+
+__NOTE: This is an irreversible process. Once deleted it cannot be retrieved back.__
+
+---
+
+#### 2. Deleting All Notes
+The command to delete all notes is
+```bash
+nman clear
+Cleared All The Notes. # Output of the above command
+```
+
+This command will clear out every single note.
+__NOTE: This is an irreversible process. Once deleted it cannot be retrieved back.__
