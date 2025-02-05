@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import Table from 'cli-table3';
 import boxen from 'boxen';
+import chalk from 'chalk';
 import { linesToDisplayPerNote, dbFilePath } from './constants.js'
 import { readDB, updateDB, useEditor } from './utilities.js';
 
@@ -21,8 +22,11 @@ export const createNote = async (name, content) => {
   // Checking if the name provided doesn't already exist in another note.
   const duplicateNote = notes.find(note => note.name === name);
   if (duplicateNote) {
-    console.log('Note with same name already exists. Try again.');
-    console.log('Existing Note =', duplicateNote);
+    console.log(chalk.redBright("Note with same name already exists. Try again."));
+    console.log(boxen(duplicateNote.content, {
+      title: duplicateNote.name,
+      titleAlignment: "center"
+    }));
     return;
   }
 
@@ -38,6 +42,11 @@ export const createNote = async (name, content) => {
   // If no content has been provided while creating the note.
   if (!content) {
     note.content = await useEditor();
+
+    if (!note.content) {
+      console.log(chalk.redBright("No content has been provided. Try again."));
+      return;
+    }
   }
 
   // Creating a note in DB
@@ -45,23 +54,31 @@ export const createNote = async (name, content) => {
 
   // Updating DB and notifying user
   updateDB(notes);
-  console.log('Note Added Successfully');
+  console.log(chalk.greenBright("Note Added Successfully"));
 }
 
 // Function to update an existing note.
-export const updateNote = (name, newContent) => {
-  const notes = readDB();
+export const updateNote = async (name, newContent) => {
+  const notes = await readDB();
   const note = notes.find(note => note.name === name);
 
   if (!note) {
-    console.log(`Error: note with name "${name}" not found`);
+    console.log(chalk.yellowBright(`Error: note with name "${name}" not found`));
     return;
   }
 
   // updated content of note will come from temp file
   // if not content is provided while updating the note.
   if (!newContent) {
-    note.content = useEditor(note.content);
+    const previousContent = note.content;
+    const newContent = await useEditor(note.content);
+
+    if (newContent === previousContent) {
+      console.log(chalk.yellowBright("No content has been updated."));
+      return;
+    }
+
+    note.content = newContent;
   } else {
     note.content = newContent;
   }
@@ -86,7 +103,7 @@ export const deleteNote = (name) => {
 
   // Updating the DB and notifying the user
   updateDB(notes);
-  console.log('Note Deleted Sucessfully');
+  console.log(chalk.greenBright("Note Deleted Sucessfully"));
 }
 
 // Function to list all the notes or a specific note from the database
@@ -101,7 +118,7 @@ export const listNotes = async (noteName) => {
 
     // Note not found
     if (!note) {
-      console.log(`Note "${noteName}" doesn't exist`);
+      console.log(chalk.yellowBright(`Note with name "${noteName}" doesn't exist`));
       return;
     }
 
@@ -114,7 +131,7 @@ export const listNotes = async (noteName) => {
   } else {
     // Empty database case
     if (notes.length === 0) {
-      console.log('Create notes. No notes are currently stored.');
+      console.log(chalk.blueBright("Create notes. No notes are currently stored."));
       return;
     }
 
@@ -148,5 +165,5 @@ export const listNotes = async (noteName) => {
 // Function to clear the database
 export const clearNotes = () => {
   updateDB([]);
-  console.log('Cleared all the notes.');
+  console.log(chalk.magentaBright("Cleared all the notes."));
 }
