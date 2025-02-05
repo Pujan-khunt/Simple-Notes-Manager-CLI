@@ -124,7 +124,8 @@ nman list
 ```
 
 Output Of the Above Command
-![Output of nman list command](./Images/nman-list.png)
+![GOT Meme](https://raw.githubusercontent.com/Pujan-khunt/Simple-Notes-Manager-CLI/main/Images/nman-list.png)
+
 
 This command will list all the lists in a table format (No., Note, Content)
 
@@ -140,7 +141,8 @@ nman list <name>
 ```
 
 Output of the above command
-![Output of nman list <note> command](./Images/GOT-Season-8-sucks.png)
+![GOT Meme](https://raw.githubusercontent.com/Pujan-khunt/Simple-Notes-Manager-CLI/main/Images/GOT-Season-8-sucks.png)
+
 
 This command will display the contents of a specific note.
 
