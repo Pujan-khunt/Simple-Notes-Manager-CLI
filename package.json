@@ -1,7 +1,7 @@
 {
   "name": "@pujan2412/notes-manager-cli",
   "description": "A simple notes manager that allows you to create, read, update and delete notes.",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "main": "bin/cli.js",
   "bin": {
     "nman": "bin/cli.js"
@@ -10,9 +10,6 @@
     "postinstall": "postInstall.js"
   },
   "keywords": [],
-  "files": [
-    "Images/"
-  ],
   "author": "Pujan Khunt",
   "license": "MIT",
   "type": "module",
